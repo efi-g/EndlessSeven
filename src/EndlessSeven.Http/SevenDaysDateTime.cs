@@ -18,4 +18,7 @@ public class SevenDaysDateTime : ISevenDaysDateTime
     public SevenDaysDateTime(string day, string hour, string minute) : this(int.Parse(day), int.Parse(hour), int.Parse(minute))
     {
     }
+
+    public override string ToString()
+        => $"{Day:D2} {Hour:D2} {Minute:D2}";
 }

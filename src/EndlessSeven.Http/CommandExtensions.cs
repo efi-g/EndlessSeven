@@ -6,7 +6,7 @@ namespace EndlessSeven.Http;
 public static class CommandExtensions
 {
     public static string ToCommand(this ICommandModel model)
-        => $"command={model.Command}&token={model.Command}";
+        => $"command={model.Command}&token={model.Token}";
 
     public static string ToCommand(this IServerCommandModel model)
     {

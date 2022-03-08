@@ -42,6 +42,8 @@ public class CommandClient : ICommandClient
 
     public async Task<string> ConsoleOutputAsync(IConsoleOutputRequest consoleOutputCommand)
     {
+        consoleOutputCommand.Token = CurrentToken;
+
         var request = new HttpRequestMessage(HttpMethod.Post, new Uri($"{UrlBase}{RelativeUrl}"));
         var content = new StringContent(consoleOutputCommand.ToCommand(), Encoding.UTF8, "application/x-www-form-urlencoded");
         request.Content = content;
@@ -53,8 +55,10 @@ public class CommandClient : ICommandClient
         return SetCurrentToken(body);
     }
 
-    public async Task<ISevenDaysDateTime> GetTimeAsync(IGetTimeRequest getTimeCommand)
+    public async Task<ISevenDaysDateTime> GetTimeAsync(IGetTimeRequest getTimeCommand, IConsoleOutputRequest consoleOutputCommand)
     {
+        getTimeCommand.Token = CurrentToken;
+
         var request = new HttpRequestMessage(HttpMethod.Post, new Uri($"{UrlBase}{RelativeUrl}"));
         var content = new StringContent(getTimeCommand.ToCommand(), Encoding.UTF8, "application/x-www-form-urlencoded");
         request.Content = content;
@@ -66,15 +70,20 @@ public class CommandClient : ICommandClient
             throw new Exception("request error");
         }
 
-        var responseData = SetCurrentToken(await response.Content.ReadAsStringAsync());
-        var matches = Regex.Matches(responseData.Split("<br>")[^2], @"Day (\d+), (\d+):(\d+)");
+        SetCurrentToken(await response.Content.ReadAsStringAsync());
 
-        return new SevenDaysDateTime(matches[0].Value, matches[1].Value, matches[2].Value);
+        var responseData = await ConsoleOutputAsync(consoleOutputCommand);
+        var matches = Regex.Matches(responseData.Split("<br>")[^2], @"Day (\d+), (\d+):(\d+)");
+        if (matches.Count == 0)
+        {
+            throw new Exception("match error");
+        }
+        return new SevenDaysDateTime(matches[0].Groups[1].Value, matches[0].Groups[2].Value, matches[0].Groups[3].Value);
     }
 
-    public async Task SetTimeAsync(ISetTimeRequest setTimeCommand, ISevenDaysDateTime dt)
+    public async Task SetTimeAsync(ISetTimeRequest setTimeCommand)
     {
-        setTimeCommand.CommandValue = $"{dt.Day} 07 00";
+        setTimeCommand.Token = CurrentToken;
 
         var request = new HttpRequestMessage(HttpMethod.Post, new Uri($"{UrlBase}{RelativeUrl}"));
         var content = new StringContent(setTimeCommand.ToCommand(), Encoding.UTF8, "application/x-www-form-urlencoded");

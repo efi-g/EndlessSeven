@@ -4,6 +4,6 @@ public interface ICommandClient
 {
     Task LoginAsync(ILoginCommandModel loginCommand);
     Task<string> ConsoleOutputAsync(IConsoleOutputRequest consoleOutputCommand);
-    Task<ISevenDaysDateTime> GetTimeAsync(IGetTimeRequest getTimeCommand);
-    Task SetTimeAsync(ISetTimeRequest setTimeCommand, ISevenDaysDateTime dt);
+    Task<ISevenDaysDateTime> GetTimeAsync(IGetTimeRequest getTimeCommand, IConsoleOutputRequest consoleOutputCommand);
+    Task SetTimeAsync(ISetTimeRequest setTimeCommand);
 }
