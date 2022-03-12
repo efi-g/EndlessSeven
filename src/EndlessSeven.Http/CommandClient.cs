@@ -72,6 +72,8 @@ public class CommandClient : ICommandClient
 
         SetCurrentToken(await response.Content.ReadAsStringAsync());
 
+        await Task.Delay(1000);
+
         var responseData = await ConsoleOutputAsync(consoleOutputCommand);
         var matches = Regex.Matches(responseData.Split("<br>")[^2], @"Day (\d+), (\d+):(\d+)");
         if (matches.Count == 0)
